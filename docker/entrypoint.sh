@@ -13,23 +13,23 @@ python manage.py migrate || exit 1
 
 create_admin_user() {
     # Get the default superuser credentials from the environment variables.
-    if [ -z "$ADMIN_EMAIL" ]; then
-        echo "ADMIN_EMAIL is not set. Using default value 'admin@localhost'."
-        ADMIN_EMAIL="admin@localhost"
+    if [ -z "$ADMIN_USERNAME" ]; then
+        echo "ADMIN_USERNAME is not set. Using default value 'admin'."
+        ADMIN_USERNAME="admin"
     fi
     if [ -z "$ADMIN_PASSWORD" ]; then
         echo "ADMIN_PASSWORD is not set. Using default value 'admin'."
         ADMIN_PASSWORD=admin
     fi
 
-    echo "$(date) | Creating superuser '$ADMIN_EMAIL' with password '$ADMIN_PASSWORD'..."
-    python manage.py createsuperuser --email "$ADMIN_EMAIL" --noinput
+    echo "$(date) | Creating superuser '$ADMIN_USERNAME' with password '$ADMIN_PASSWORD'..."
+    python manage.py createsuperuser --username "$ADMIN_USERNAME" --email "$ADMIN_USERNAME@localhost" --noinput
     python manage.py shell -c "
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
-user = User.objects.filter(email='$ADMIN_EMAIL').first()
+user = User.objects.get(username='$ADMIN_USERNAME')
 user.set_password('$ADMIN_PASSWORD')
 user.is_active = True
 user.save()
